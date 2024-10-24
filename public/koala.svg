@@ -1,0 +1,26 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Body -->
+  <circle cx="256" cy="256" r="240" fill="#8E8E8E"/>
+  
+  <!-- Inner face -->
+  <circle cx="256" cy="256" r="200" fill="#D9D9D9"/>
+  
+  <!-- Ears -->
+  <circle cx="106" cy="156" r="60" fill="#8E8E8E"/>
+  <circle cx="406" cy="156" r="60" fill="#8E8E8E"/>
+  <circle cx="106" cy="156" r="40" fill="#595959"/>
+  <circle cx="406" cy="156" r="40" fill="#595959"/>
+  
+  <!-- Eyes -->
+  <circle cx="176" cy="246" r="30" fill="#333"/>
+  <circle cx="336" cy="246" r="30" fill="#333"/>
+  <circle cx="186" cy="236" r="10" fill="#FFF"/>
+  <circle cx="346" cy="236" r="10" fill="#FFF"/>
+  
+  <!-- Nose -->
+  <circle cx="256" cy="296" r="30" fill="#333"/>
+  
+  <!-- Cheeks -->
+  <circle cx="166" cy="306" r="25" fill="#FFD7D7" fill-opacity="0.6"/>
+  <circle cx="346" cy="306" r="25" fill="#FFD7D7" fill-opacity="0.6"/>
+</svg>
