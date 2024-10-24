@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link2, AlertCircle, Loader2 } from 'lucide-react';
+import { Link2, AlertCircle, Loader2, ClipboardCopy } from 'lucide-react';
 
 interface JobUrlInputProps {
   onJobDescriptionParsed: (description: string) => void;
@@ -8,11 +8,13 @@ interface JobUrlInputProps {
 const JobUrlInput: React.FC<JobUrlInputProps> = ({ onJobDescriptionParsed }) => {
   const [url, setUrl] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [details, setDetails] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setDetails(null);
     setIsLoading(true);
 
     try {
@@ -30,10 +32,18 @@ const JobUrlInput: React.FC<JobUrlInputProps> = ({ onJobDescriptionParsed }) => 
         throw new Error(data.error || 'Failed to fetch job description');
       }
 
-      onJobDescriptionParsed(data.description);
-      setUrl('');
+      if (data.description) {
+        onJobDescriptionParsed(data.description);
+        setUrl('');
+      } else {
+        throw new Error('No job description found');
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch job description');
+      const error = err as Error;
+      setError(error.message);
+      if (error.message.includes('LinkedIn prevents')) {
+        setDetails('Try copying the job description directly from LinkedIn instead.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -75,9 +85,17 @@ const JobUrlInput: React.FC<JobUrlInputProps> = ({ onJobDescriptionParsed }) => 
       </form>
 
       {error && (
-        <div className="mt-2 flex items-center gap-2 text-red-600 text-sm">
-          <AlertCircle className="h-4 w-4" />
-          <span>{error}</span>
+        <div className="mt-2 space-y-2">
+          <div className="flex items-center gap-2 text-red-600 text-sm">
+            <AlertCircle className="h-4 w-4 flex-shrink-0" />
+            <span>{error}</span>
+          </div>
+          {details && (
+            <div className="flex items-center gap-2 text-gray-600 text-sm">
+              <ClipboardCopy className="h-4 w-4 flex-shrink-0" />
+              <span>{details}</span>
+            </div>
+          )}
         </div>
       )}
     </div>
