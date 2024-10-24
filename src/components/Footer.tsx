@@ -10,8 +10,8 @@ const Footer = () => {
           <div className="text-center sm:text-left">
             <p className="text-sm sm:text-base text-gray-600">© 2024 Resume Koala. All rights reserved.</p>
             <div className="flex gap-4 mt-2 text-sm text-gray-500">
-              <Link to="/terms" className="hover:text-indigo-600 transition">Terms</Link>
               <Link to="/privacy" className="hover:text-indigo-600 transition">Privacy</Link>
+              <Link to="/terms" className="hover:text-indigo-600 transition">Terms</Link>
               <Link to="/about" className="hover:text-indigo-600 transition">About</Link>
             </div>
           </div>

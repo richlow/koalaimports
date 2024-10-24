@@ -1,17 +1,23 @@
 import React, { useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  const { currentUser } = useAuth();
 
   const navigation = [
     { name: 'Home', href: '/' },
-    { name: 'About', href: '/about' },
-    { name: 'Terms', href: '/terms' },
-    { name: 'Privacy', href: '/privacy' }
+    { name: 'Job Tracker', href: '/jobs' },
+    { name: 'About', href: '/about' }
   ];
+
+  // Add Dashboard for authenticated users
+  if (currentUser) {
+    navigation.push({ name: 'Dashboard', href: '/dashboard' });
+  }
 
   return (
     <header className="bg-white shadow-sm">
@@ -51,6 +57,16 @@ const Header = () => {
                   </Link>
                 </li>
               ))}
+              {!currentUser && (
+                <li>
+                  <Link
+                    to="/login"
+                    className="text-sm font-medium text-indigo-600 hover:text-indigo-700"
+                  >
+                    Sign In
+                  </Link>
+                </li>
+              )}
             </ul>
           </nav>
         </div>
@@ -74,6 +90,17 @@ const Header = () => {
                   </Link>
                 </li>
               ))}
+              {!currentUser && (
+                <li>
+                  <Link
+                    to="/login"
+                    className="block text-sm font-medium text-indigo-600 hover:text-indigo-700"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Sign In
+                  </Link>
+                </li>
+              )}
             </ul>
           </nav>
         )}
