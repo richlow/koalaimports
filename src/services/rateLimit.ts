@@ -7,11 +7,17 @@ interface UsageRecord {
 }
 
 const FREE_DAILY_LIMIT = 3;
+const IS_DEVELOPMENT = import.meta.env.DEV;
 
 export class RateLimitService {
   private static STORAGE_KEY = 'resume_koala_usage';
 
   static getCurrentUsage(): UsageRecord {
+    // In development, always return a fresh usage record
+    if (IS_DEVELOPMENT) {
+      return this.createNewUsageRecord();
+    }
+
     const stored = localStorage.getItem(this.STORAGE_KEY);
     if (!stored) {
       return this.createNewUsageRecord();
@@ -29,6 +35,9 @@ export class RateLimitService {
   }
 
   static incrementUsage(): void {
+    // Don't track usage in development
+    if (IS_DEVELOPMENT) return;
+
     const usage = this.getCurrentUsage();
     usage.count += 1;
     usage.lastUsed = new Date().toISOString();
@@ -36,11 +45,17 @@ export class RateLimitService {
   }
 
   static canUseService(): boolean {
+    // Always allow usage in development
+    if (IS_DEVELOPMENT) return true;
+
     const usage = this.getCurrentUsage();
     return usage.count < FREE_DAILY_LIMIT;
   }
 
   static getRemainingChecks(): number {
+    // Show unlimited checks in development
+    if (IS_DEVELOPMENT) return 999;
+
     const usage = this.getCurrentUsage();
     return Math.max(0, FREE_DAILY_LIMIT - usage.count);
   }
