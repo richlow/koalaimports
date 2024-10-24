@@ -1,61 +1,83 @@
+import { db } from '../config/firebase';
+import { collection, doc, getDocs, setDoc, deleteDoc, query, where } from 'firebase/firestore';
 import { JobApplication, Interview } from '../types/job';
-
-const STORAGE_KEY = 'resume_koala_jobs';
+import { auth } from '../config/firebase';
 
 export class JobStorageService {
-  static getAllJobs(): JobApplication[] {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    return stored ? JSON.parse(stored) : [];
+  private static getJobsCollection() {
+    if (!auth.currentUser) throw new Error('User must be logged in');
+    return collection(db, 'users', auth.currentUser.uid, 'jobs');
   }
 
-  static getJob(id: string): JobApplication | null {
-    const jobs = this.getAllJobs();
-    return jobs.find(job => job.id === id) || null;
-  }
-
-  static saveJob(job: JobApplication): void {
-    const jobs = this.getAllJobs();
-    const existingIndex = jobs.findIndex(j => j.id === job.id);
-    
-    if (existingIndex >= 0) {
-      jobs[existingIndex] = job;
-    } else {
-      jobs.push(job);
+  static async getAllJobs(): Promise<JobApplication[]> {
+    try {
+      const jobsCollection = this.getJobsCollection();
+      const querySnapshot = await getDocs(jobsCollection);
+      return querySnapshot.docs.map(doc => doc.data() as JobApplication);
+    } catch (error) {
+      console.error('Error fetching jobs:', error);
+      return [];
     }
-
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(jobs));
   }
 
-  static deleteJob(id: string): void {
-    const jobs = this.getAllJobs();
-    const filtered = jobs.filter(job => job.id !== id);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+  static async getJob(id: string): Promise<JobApplication | null> {
+    try {
+      const jobsCollection = this.getJobsCollection();
+      const jobDoc = doc(jobsCollection, id);
+      const jobSnapshot = await getDocs(query(jobsCollection, where('id', '==', id)));
+      
+      if (jobSnapshot.empty) return null;
+      return jobSnapshot.docs[0].data() as JobApplication;
+    } catch (error) {
+      console.error('Error fetching job:', error);
+      return null;
+    }
   }
 
-  static addInterview(jobId: string, interview: Interview): void {
-    const job = this.getJob(jobId);
+  static async saveJob(job: JobApplication): Promise<void> {
+    try {
+      const jobsCollection = this.getJobsCollection();
+      await setDoc(doc(jobsCollection, job.id), job);
+    } catch (error) {
+      console.error('Error saving job:', error);
+      throw error;
+    }
+  }
+
+  static async deleteJob(id: string): Promise<void> {
+    try {
+      const jobsCollection = this.getJobsCollection();
+      await deleteDoc(doc(jobsCollection, id));
+    } catch (error) {
+      console.error('Error deleting job:', error);
+      throw error;
+    }
+  }
+
+  static async addInterview(jobId: string, interview: Interview): Promise<void> {
+    const job = await this.getJob(jobId);
     if (job) {
       job.interviews.push(interview);
-      this.saveJob(job);
+      await this.saveJob(job);
     }
   }
 
-  static updateInterview(jobId: string, interview: Interview): void {
-    const job = this.getJob(jobId);
+  static async updateInterview(jobId: string, interview: Interview): Promise<void> {
+    const job = await this.getJob(jobId);
     if (job) {
       const index = job.interviews.findIndex(i => i.id === interview.id);
       if (index >= 0) {
         job.interviews[index] = interview;
-        this.saveJob(job);
+        await this.saveJob(job);
       }
     }
   }
 
-  static deleteInterview(jobId: string, interviewId: string): void {
-    const job = this.getJob(jobId);
+  static async deleteInterview(jobId: string, interviewId: string): Promise<void> {
+    const job = await this.getJob(jobId);
     if (job) {
       job.interviews = job.interviews.filter(i => i.id !== interviewId);
-      this.saveJob(job);
+      await this.saveJob(job);
     }
   }
 }

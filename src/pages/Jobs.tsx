@@ -1,27 +1,28 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { useFeature } from '../hooks/useFeature';
+import { useAuth } from '../contexts/AuthContext';
 import Layout from '../components/Layout';
 import JobList from '../components/JobTracker/JobList';
 import JobForm from '../components/JobTracker/JobForm';
 import JobDetails from '../components/JobTracker/JobDetails';
+import AuthPrompt from '../components/Auth/AuthPrompt';
 
 const Jobs: React.FC = () => {
-  const isEnabled = useFeature('jobTrackingCRM');
-
-  if (!isEnabled) {
-    return null;
-  }
+  const { currentUser } = useAuth();
 
   return (
     <Layout>
       <div className="container mx-auto px-4 py-8">
-        <Routes>
-          <Route path="/" element={<JobList />} />
-          <Route path="/new" element={<JobForm />} />
-          <Route path="/:id" element={<JobDetails />} />
-          <Route path="/:id/edit" element={<JobForm />} />
-        </Routes>
+        {currentUser ? (
+          <Routes>
+            <Route path="/" element={<JobList />} />
+            <Route path="/new" element={<JobForm />} />
+            <Route path="/:id" element={<JobDetails />} />
+            <Route path="/:id/edit" element={<JobForm />} />
+          </Routes>
+        ) : (
+          <AuthPrompt />
+        )}
       </div>
     </Layout>
   );

@@ -1,41 +1,31 @@
-import { InterviewStage, JobStatus } from './jobStatus';
-
-export interface TimelineEvent {
+export interface JobNote {
   id: string;
-  type: 'note' | 'email' | 'call' | 'interview' | 'application' | 'offer' | 'other';
-  date: string;
+  content: string;
+  createdAt: string;
+}
+
+export interface JobEvent {
+  id: string;
+  type: 'interview' | 'application' | 'offer' | 'rejection' | 'follow-up' | 'other';
   title: string;
   description?: string;
-  outcome?: string;
-}
-
-export interface JobApplication {
-  id: string;
-  companyName: string;
-  jobTitle: string;
-  jobDescription: string;
-  status: JobStatus;
-  dateAdded: string;
-  dateApplied?: string;
-  location: string;
-  salary?: string;
-  resumeVersion?: string;
-  coverLetter?: string;
-  notes?: string;
-  interviews: Interview[];
-  timeline: TimelineEvent[];
-  url?: string;
-  contactName?: string;
-  contactEmail?: string;
-  followUpDate?: string;
-  archived?: boolean;
-}
-
-export interface Interview {
-  id: string;
-  stage: InterviewStage;
   date: string;
-  notes?: string;
-  completed: boolean;
-  feedback?: string;
+  createdAt: string;
+}
+
+export interface Job {
+  id: string;
+  userId: string;
+  company: string;
+  position: string;
+  location: string;
+  jobDescription: string;
+  status: 'active' | 'archived' | 'rejected' | 'accepted';
+  applicationDate?: string;
+  salary?: string;
+  url?: string;
+  notes: JobNote[];
+  events: JobEvent[];
+  createdAt: string;
+  updatedAt?: string;
 }
